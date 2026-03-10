@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.management.Descriptor;
-
 @RestController
 @RequestMapping("/api/summary")
 @RequiredArgsConstructor
-@Tag(name = "Summary", description = "")
+@Tag(name = "Summary", description = "Monthly financial summaries")
 public class SummaryController {
     private final SummaryService service;
 
