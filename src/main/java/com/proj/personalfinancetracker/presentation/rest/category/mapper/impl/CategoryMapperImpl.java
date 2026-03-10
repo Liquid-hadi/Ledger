@@ -13,7 +13,7 @@ public class CategoryMapperImpl implements CategoryMapper {
         CategoryResponseModel res = new CategoryResponseModel();
         res.setId(categoryEntity.getId());
         res.setName(categoryEntity.getName());
-        res.setName(categoryEntity.getType().toString());
+        res.setType(categoryEntity.getType());
         return res;
     }
 
