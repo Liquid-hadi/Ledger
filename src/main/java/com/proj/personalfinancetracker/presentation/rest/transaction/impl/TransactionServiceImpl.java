@@ -68,7 +68,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     //----------------------Validation---------------
     private CategoryEntity categoryExists(Long categoryId) {
-        if (categoryId != null) return null;
-        return categoryRepo.findByIdAndStatus(categoryId, Status.ACTIVE).orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
+        if (categoryId == null) return null;
+        return categoryRepo.findByIdAndStatus(categoryId, Status.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
     }
 }
