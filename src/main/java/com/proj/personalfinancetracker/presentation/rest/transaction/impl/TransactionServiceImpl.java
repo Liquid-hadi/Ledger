@@ -5,12 +5,13 @@ import com.proj.personalfinancetracker.external.db.financedb.myfinance.entity.Tr
 import com.proj.personalfinancetracker.external.db.financedb.myfinance.repository.CategoryRepo;
 import com.proj.personalfinancetracker.external.db.financedb.myfinance.repository.TransactionRepo;
 import com.proj.personalfinancetracker.model.enums.Status;
-import com.proj.personalfinancetracker.model.transaction.TransactionListModel;
-import com.proj.personalfinancetracker.model.transaction.TransactionRequestModel;
-import com.proj.personalfinancetracker.model.transaction.TransactionResponseModel;
+import com.proj.personalfinancetracker.model.transaction.*;
 import com.proj.personalfinancetracker.presentation.rest.transaction.TransactionService;
 import com.proj.personalfinancetracker.presentation.rest.transaction.mapper.TransactionMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +32,29 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponseModel getById(Long id) {
         return transactionMapper.toResponse(findById(id));
+    }
+
+    @Override
+    public PagedTransactionResponse getFiltered(TransactionFilterRequest filter) {
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
+
+        Page<TransactionEntity> page = transactionRepo.findWithFilters(
+                filter.getType(),
+                filter.getCategoryId(),
+                filter.getStartDate(),
+                filter.getEndDate(),
+                pageable
+        );
+        PagedTransactionResponse response = new PagedTransactionResponse();
+
+        response.setTransactions(page.getContent().stream().map(transactionMapper::toResponse).toList());
+
+        response.setCurrentPage(page.getNumber());
+        response.setTotalPages(page.getTotalPages());
+        response.setTotalElements(page.getTotalElements());
+        response.setSize(page.getSize());
+
+        return response;
     }
 
     @Override

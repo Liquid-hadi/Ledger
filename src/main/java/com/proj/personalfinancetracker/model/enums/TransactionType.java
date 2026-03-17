@@ -2,7 +2,7 @@ package com.proj.personalfinancetracker.model.enums;
 
 public enum TransactionType {
     INCOME ("Income"),
-    OUTCOME("Expense");
+    EXPENSE("Expense");
 
     private final String value;
 

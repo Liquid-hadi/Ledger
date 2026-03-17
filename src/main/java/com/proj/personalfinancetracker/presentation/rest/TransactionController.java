@@ -1,8 +1,6 @@
 package com.proj.personalfinancetracker.presentation.rest;
 
-import com.proj.personalfinancetracker.model.transaction.TransactionListModel;
-import com.proj.personalfinancetracker.model.transaction.TransactionRequestModel;
-import com.proj.personalfinancetracker.model.transaction.TransactionResponseModel;
+import com.proj.personalfinancetracker.model.transaction.*;
 import com.proj.personalfinancetracker.presentation.rest.transaction.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +19,8 @@ public class TransactionController {
 
     @GetMapping
     @Operation(summary = "Get all transactions")
-    public ResponseEntity<TransactionListModel> getAll(){
-        return ResponseEntity.ok(transactionService.getAll());
+    public ResponseEntity<PagedTransactionResponse> getAll(@ModelAttribute TransactionFilterRequest filter){
+        return ResponseEntity.ok(transactionService.getFiltered(filter));
     }
 
     @GetMapping("/{id}")

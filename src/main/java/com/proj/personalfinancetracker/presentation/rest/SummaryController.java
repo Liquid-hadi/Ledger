@@ -11,16 +11,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/summary")
 @RequiredArgsConstructor
-@Tag(name = "Summary", description = "Monthly financial summaries")
+@Tag(name = "Summary", description = "Date range financial summaries")
 public class SummaryController {
     private final SummaryService service;
 
     @GetMapping
-    @Operation(summary = "Get monthly summary", description = "Returns total income, expenses and net balance for a given month")
-    private ResponseEntity<MonthlySummaryResponseModel> getMonthlySummary(@RequestParam int year, @RequestParam int month){
-        return ResponseEntity.ok(service.getMonthlySummary(year, month));
+    @Operation(summary = "Get summary by date range", description = "Returns total income, expenses and net balance for a given date range")
+    private ResponseEntity<MonthlySummaryResponseModel> getSummary(@RequestParam String startDate, @RequestParam String endDate){
+        return ResponseEntity.ok(service.getSummary(LocalDate.parse(startDate), LocalDate.parse(endDate)));
     }
 }

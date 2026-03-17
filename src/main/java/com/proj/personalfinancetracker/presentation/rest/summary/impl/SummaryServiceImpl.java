@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -15,13 +16,14 @@ public class SummaryServiceImpl implements SummaryService {
     private final TransactionRepo transactionRepo;
 
     @Override
-    public MonthlySummaryResponseModel getMonthlySummary(int year, int month) {
-        BigDecimal totalIncome = transactionRepo.sumIncomeByMonth(year, month);
-        BigDecimal totalExpense = transactionRepo.sumExpensesByMonth(year, month);
+    public MonthlySummaryResponseModel getSummary(LocalDate start, LocalDate end) {
+        BigDecimal totalIncome = transactionRepo.sumIncomeByDateRange(start, end);
+        BigDecimal totalExpense = transactionRepo.sumExpensesByDateRange(start, end);
 
         MonthlySummaryResponseModel summary = new MonthlySummaryResponseModel();
-        summary.setYear(year);
-        summary.setMonth(month);
+        summary.setStartDate(start);
+        summary.setEndDate(end);
+
         summary.setTotalIncome(totalIncome);
         summary.setTotalExpense(totalExpense);
         summary.setNetBalance(totalIncome.subtract(totalExpense));
