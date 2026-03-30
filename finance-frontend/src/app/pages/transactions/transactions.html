@@ -1,0 +1,400 @@
+<div class="min-h-screen flex justify-center" style="background: var(--bg);">
+  <div class="w-full max-w-5xl px-6 py-8">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between mb-8 fade-up">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest mb-1.5"
+           style="color: var(--gold); letter-spacing: 0.18em;">Ledger</p>
+        <h1 class="font-display text-4xl font-semibold" style="line-height: 1.15;">Transactions</h1>
+      </div>
+      <button class="btn btn-primary" (click)="openAdd()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        New Transaction
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card p-2 mb-5 fade-up fade-up-1">
+
+      <!-- Filter bar header -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
+          <p class="text-xs font-semibold uppercase tracking-widest"
+             style="color: var(--text-muted); letter-spacing: 0.13em;">Filters</p>
+
+        </div>
+        @if (hasActiveFilters) {
+        <button class="btn btn-ghost btn-sm" (click)="clearFilters()">Clear</button>
+        }
+      </div>
+
+      <div class="grid grid-cols-4 gap-4">
+
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest mb-1.5"
+             style="color: var(--text-muted); letter-spacing: 0.13em;">Type</p>
+          <div class="relative">
+            <select [(ngModel)]="filterType" (change)="onFilterChange()">
+              <option value="">All Types</option>
+              <option value="INCOME">Income</option>
+              <option value="EXPENSE">Expense</option>
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                   stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest mb-1.5"
+             style="color: var(--text-muted); letter-spacing: 0.13em;">Category</p>
+          <div class="relative">
+            <select [(ngModel)]="filterCategory" (change)="onFilterChange()">
+              <option value="">All Categories</option>
+              @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+              }
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                   stroke="var(--text-muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest mb-1.5"
+             style="color: var(--text-muted); letter-spacing: 0.13em;">From</p>
+          <input type="date" [(ngModel)]="filterStartDate" (change)="onFilterChange()" />
+        </div>
+
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest mb-1.5"
+             style="color: var(--text-muted); letter-spacing: 0.13em;">To</p>
+          <input type="date" [(ngModel)]="filterEndDate" (change)="onFilterChange()" />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Meta row -->
+    <div class="flex items-center justify-between mb-4 fade-up fade-up-2">
+      <p class="text-sm" style="color: var(--text-muted);">
+        <span style="color: var(--text); font-weight: 500;">{{ totalElements() }}</span>
+        transaction{{ totalElements() !== 1 ? 's' : '' }}
+      </p>
+      @if (totalPages() > 1) {
+      <p class="text-sm font-mono" style="color: var(--text-muted); font-size: 0.8rem;">
+        Page {{ currentPage() + 1 }} / {{ totalPages() }}
+      </p>
+      }
+    </div>
+
+    <!-- Table card -->
+    <div class="card fade-up fade-up-3" style="overflow: hidden;">
+
+      @if (isLoading()) {
+      <!-- Loading state -->
+      <div class="flex items-center justify-center py-24">
+        <div class="spinner"></div>
+      </div>
+
+      } @else if (transactions().length === 0) {
+      <!-- Empty state -->
+      <div class="flex flex-col items-center justify-center py-24 gap-4">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+             style="background: var(--elevated);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+            <line x1="9" y1="12" x2="15" y2="12"/>
+            <line x1="9" y1="16" x2="13" y2="16"/>
+          </svg>
+        </div>
+        <div class="text-center">
+          <p class="font-medium mb-1" style="color: var(--text-sub);">No transactions found</p>
+          <p class="text-sm" style="color: var(--text-muted);">Try adjusting the filters or add a new transaction</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" (click)="openAdd()">Add first transaction</button>
+      </div>
+
+      } @else {
+      <!-- Data table -->
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Type</th>
+          <th style="text-align: right;">Amount</th>
+          <th style="width: 80px;"></th>
+        </tr>
+        </thead>
+        <tbody>
+        @for (t of transactions(); track t.id) {
+        <tr>
+          <td>
+            <div style="line-height: 1.3;">
+              <p class="font-mono"
+                 style="font-size: 0.82rem; color: var(--text-sub); font-weight: 500;">
+                {{ t.date | date:'MMM d' }}
+              </p>
+              <p class="font-mono"
+                 style="font-size: 0.72rem; color: var(--text-muted);">
+                {{ t.date | date:'yyyy' }}
+              </p>
+            </div>
+          </td>
+          <td>
+            <p style="color: var(--text); font-weight: 500;">{{ t.description }}</p>
+            @if (t.notes) {
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              {{ t.notes }}
+            </p>
+            }
+          </td>
+          <td>
+            @if (t.categoryName) {
+            <span style="background: var(--indigo-dim); color: var(--indigo);
+                         font-size: 0.75rem; padding: 3px 9px; border-radius: 6px;
+                         font-weight: 500;">
+              {{ t.categoryName }}
+            </span>
+            } @else {
+            <span style="color: var(--text-muted);">—</span>
+            }
+          </td>
+          <td>
+            <span class="badge"
+                  [class.badge-income]="t.type === 'INCOME'"
+                  [class.badge-expense]="t.type === 'EXPENSE'">
+              {{ t.type }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <span class="font-mono font-bold" style="font-size: 0.875rem;"
+                  [style.color]="t.type === 'INCOME' ? 'var(--income)' : 'var(--expense)'">
+              {{ t.type === 'INCOME' ? '+' : '−' }}{{ t.amount | number:'1.2-2' }}
+            </span>
+          </td>
+          <td>
+            <div class="flex items-center justify-end gap-1">
+              <button class="btn btn-ghost btn-icon btn-sm" (click)="openEdit(t)" title="Edit">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="btn btn-danger btn-icon btn-sm" (click)="confirmDelete(t.id)" title="Delete">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14H6L5 6"/>
+                  <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+      <div class="flex items-center justify-center gap-1 p-4"
+           style="border-top: 1px solid var(--border);">
+        <button class="btn btn-ghost btn-icon btn-sm"
+                [disabled]="currentPage() === 0"
+                [style.opacity]="currentPage() === 0 ? '0.3' : '1'"
+                (click)="loadTransactions(currentPage() - 1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        @for (p of pages; track p) {
+        @if (showPage(p)) {
+        <button class="btn btn-sm font-mono" style="min-width: 34px; font-size: 0.8rem;"
+                [style.background]="p === currentPage() ? 'var(--gold-dim)' : 'transparent'"
+                [style.color]="p === currentPage() ? 'var(--gold)' : 'var(--text-sub)'"
+                [style.border]="p === currentPage()
+                          ? '1px solid rgba(212,168,83,0.28)'
+                          : '1px solid transparent'"
+                (click)="loadTransactions(p)">
+          {{ p + 1 }}
+        </button>
+        }
+        }
+
+        <button class="btn btn-ghost btn-icon btn-sm"
+                [disabled]="currentPage() >= totalPages() - 1"
+                [style.opacity]="currentPage() >= totalPages() - 1 ? '0.3' : '1'"
+                (click)="loadTransactions(currentPage() + 1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      }
+      }
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     Add / Edit Modal
+════════════════════════════════════════════ -->
+@if (showModal) {
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <!-- Modal header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-display text-xl font-semibold" style="color: var(--text);">
+        {{ isEditing ? 'Edit Transaction' : 'New Transaction' }}
+      </h2>
+      <button class="btn btn-ghost btn-icon" (click)="closeModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-4">
+
+      <!-- Type toggle -->
+      <div>
+        <label class="form-label">Type</label>
+        <div class="grid grid-cols-2 gap-2 p-1 rounded-xl" style="background: var(--elevated);">
+          <button class="btn py-2 rounded-lg text-sm"
+                  [style.background]="form.type === 'EXPENSE' ? 'var(--expense-dim)' : 'transparent'"
+                  [style.color]="form.type === 'EXPENSE' ? 'var(--expense)' : 'var(--text-sub)'"
+                  [style.border]="form.type === 'EXPENSE'
+                      ? '1px solid rgba(251,113,133,0.22)'
+                      : '1px solid transparent'"
+                  (click)="form.type = 'EXPENSE'; onTypeChange()">
+            Expense
+          </button>
+          <button class="btn py-2 rounded-lg text-sm"
+                  [style.background]="form.type === 'INCOME' ? 'var(--income-dim)' : 'transparent'"
+                  [style.color]="form.type === 'INCOME' ? 'var(--income)' : 'var(--text-sub)'"
+                  [style.border]="form.type === 'INCOME'
+                      ? '1px solid rgba(74,222,128,0.22)'
+                      : '1px solid transparent'"
+                  (click)="form.type = 'INCOME'; onTypeChange()">
+            Income
+          </button>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="form-label">Description</label>
+        <input type="text" [(ngModel)]="form.description"
+               placeholder="e.g. Monthly salary, Grocery run…" />
+      </div>
+
+      <!-- Amount + Date -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="form-label">Amount (SAR)</label>
+          <input type="number" [(ngModel)]="form.amount"
+                 placeholder="0.00" min="0" step="0.01"
+                 style="font-family: 'Space Mono', monospace;" />
+        </div>
+        <div>
+          <label class="form-label">Date</label>
+          <input type="date" [(ngModel)]="form.date" />
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label class="form-label">Category</label>
+        <div class="relative">
+          <select [(ngModel)]="form.categoryId">
+            <option [ngValue]="null">No category</option>
+            @for (cat of filteredCategories; track cat.id) {
+            <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                 stroke="var(--text-muted)" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label class="form-label">
+          Notes
+          <span style="color: var(--text-muted); font-size: 0.72rem; text-transform: none;
+                       letter-spacing: 0; margin-left: 4px;">(optional)</span>
+        </label>
+        <input type="text" [(ngModel)]="form.notes"
+               placeholder="Any additional context…" />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-2">
+        <button class="btn btn-ghost flex-1" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary flex-1" (click)="submitForm()">
+          {{ isEditing ? 'Save Changes' : 'Add Transaction' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+}
+
+
+<!-- ══════════════════════════════════════════ Delete Confirmation Modal ════════════════════════════════════════════ -->
+@if (showDeleteConfirm) {
+<div class="modal-overlay" (click)="cancelDelete()">
+  <div class="modal-box" style="max-width: 380px;" (click)="$event.stopPropagation()">
+    <div class="flex flex-col items-center text-center gap-4">
+
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+           style="background: var(--expense-dim); border: 1px solid rgba(251,113,133,0.15);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="var(--expense)" stroke-width="1.8" stroke-linecap="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+        </svg>
+      </div>
+
+      <div>
+        <h2 class="font-display text-xl font-semibold mb-1.5">Delete Transaction?</h2>
+        <p class="text-sm" style="color: var(--text-sub);">
+          This cannot be undone. The transaction will be permanently removed.
+        </p>
+      </div>
+
+      <div class="flex gap-3 w-full pt-1">
+        <button class="btn btn-ghost flex-1" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger flex-1" (click)="doDelete()">Delete</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+}
