@@ -178,9 +178,3 @@ App runs at: `http://localhost:4200`
 | `CategoryType` | `INCOME`, `EXPENSE` |
 | `TransactionType` | `INCOME`, `EXPENSE` |
 | `Status` | `ACTIVE`, `DELETED` |
-
----
-
-## 📅 Budget Cycle
-
-This app tracks a **22nd-to-21st monthly budget cycle** (e.g. Jan 22 → Feb 21).
