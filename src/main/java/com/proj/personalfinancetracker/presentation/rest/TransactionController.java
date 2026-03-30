@@ -25,7 +25,7 @@ public class TransactionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get transaction by id")
-    public ResponseEntity<TransactionResponseModel> getById(@RequestParam Long id){
+    public ResponseEntity<TransactionResponseModel> getById(@PathVariable Long id){
         return ResponseEntity.ok(transactionService.getById(id));
     }
 
@@ -37,13 +37,13 @@ public class TransactionController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing transaction")
-    public ResponseEntity<TransactionResponseModel> update(@RequestParam Long id, @Valid @RequestBody TransactionRequestModel request){
+    public ResponseEntity<TransactionResponseModel> update(@PathVariable Long id, @Valid @RequestBody TransactionRequestModel request){
         return ResponseEntity.ok(transactionService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a transaction")
-    public ResponseEntity<Void> delete(@RequestParam Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id){
         transactionService.delete(id);
         return ResponseEntity.noContent().build();
     }
